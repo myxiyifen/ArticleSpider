@@ -8,7 +8,7 @@
 import scrapy
 import datetime
 import re
-from scrapy.loader.processors import MapCompose,TakeFirst,Join
+from scrapy.loader.processors import MapCompose, TakeFirst, Join
 from scrapy.loader import ItemLoader
 
 
@@ -19,7 +19,7 @@ class ArticlespiderItem(scrapy.Item):
 
 
 def add_jobbole(value):
-    return value+"-jobble"
+    return value + "-jobble"
 
 
 def date_convert(value):
@@ -29,6 +29,7 @@ def date_convert(value):
         create_date = datetime.datetime.now().date()
     return create_date
 
+
 def get_nums(value):
     match_re = re.match(".*?(\d+).*", value)
     if match_re:
@@ -37,6 +38,7 @@ def get_nums(value):
         nums = 0
     return nums
 
+
 def remove_comment_tags(value):
     #     去掉tag中提取的评论
     if "评论" in value:
@@ -44,14 +46,17 @@ def remove_comment_tags(value):
     else:
         return value
 
-#     什么都不做
+
+# 什么都不做
 def return_value(value):
     return value
+
 
 # 重载ItemLoader类
 class ArticleItemLoader(ItemLoader):
     # 自定义ItemLoader
     default_output_processor = TakeFirst()
+
 
 class JobBoleArticleItem(scrapy.Item):
     title = scrapy.Field()
@@ -62,7 +67,7 @@ class JobBoleArticleItem(scrapy.Item):
     url = scrapy.Field()
     url_object_id = scrapy.Field()
     front_image_url = scrapy.Field(
-        #覆盖掉 default_output_processor = TakeFirst()
+        # 覆盖掉 default_output_processor = TakeFirst()
         output_processor=MapCompose(return_value)
     )
     front_image_path = scrapy.Field()
@@ -81,3 +86,29 @@ class JobBoleArticleItem(scrapy.Item):
     )
     content = scrapy.Field()
 
+
+class ZhihuQuestionItem(scrapy.Item):
+    #         知乎问题item
+    zhihu_id = scrapy.Field()
+    topics = scrapy.Field()
+    url = scrapy.Field()
+    title = scrapy.Field()
+    content = scrapy.Field()
+    answer_num = scrapy.Field()
+    comments_num = scrapy.Field()
+    watch_user_num = scrapy.Field()
+    click_num = scrapy.Field()
+    crawl_time = scrapy.Field()
+
+class ZhihuAnswerItem(scrapy.Item):
+    #     知乎问题回答item
+    zhihu_id=scrapy.Field()
+    url=scrapy.Field()
+    qestion_id=scrapy.Field()
+    author_id=scrapy.Field()
+    content=scrapy.Field()
+    parise_num=scrapy.Field() # 点赞数
+    comments_num=scrapy.Field()
+    create_time=scrapy.Field()
+    update_time=scrapy.Field()
+    crawl_time=scrapy.Field()
