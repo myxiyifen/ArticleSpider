@@ -82,9 +82,10 @@ class ZhihuSpider(scrapy.Spider):
                 question_id = match_obj.group(2)
                 # print(request_url, question_id)
                 yield scrapy.Request(request_url, headers=self.headers, callback=self.parse_question)
+                # break
             else:
                 # 如果不是question Url，则对此url进行进一步跟踪，即继续解析
-                yield scrapy.Request(url, headers=self.headers, callback=parse)
+                yield scrapy.Request(url, headers=self.headers, callback=self.parse)
 
     def parse_question(self, response):
         # 处理question页面，从页面中提取出具体的question item
@@ -134,11 +135,11 @@ class ZhihuSpider(scrapy.Spider):
             answer_item=ZhihuAnswerItem()
             answer_item["zhihu_id"]=answer["id"]
             answer_item["url"]=answer["url"]
-            answer_item["qestion_id"]=answer["question"]["id"]
+            answer_item["question_id"]=answer["question"]["id"]
             answer_item["author_id"]=answer["author"]["id"] if "id" in answer["author"] else None
             answer_item["content"]=answer["content"] if "content" in answer else None
             # 点赞数
-            answer_item["parise_num"]=answer["voteup_count"]
+            answer_item["praise_num"]=answer["voteup_count"]
             answer_item["comments_num"]=answer["comment_count"]
             answer_item["create_time"]=answer["created_time"]
             answer_item["update_time"]=answer["updated_time"]
@@ -149,7 +150,6 @@ class ZhihuSpider(scrapy.Spider):
         if not is_end:
             yield scrapy.Request(next_url, headers=self.headers,
                                  callback=self.parse_answer)
-        pass
 
     # 处理响应内容
     def parse_page(self, response):
@@ -159,7 +159,7 @@ class ZhihuSpider(scrapy.Spider):
     # 此函数执行后，因为没定义回调函数callback,所以自动调用parse函数
     def check_login(self, response):
         for url in self.start_urls:
-            yield scrapy.Request(url, dont_filter=True, headers=self.headers, )
+            yield scrapy.Request(url, dont_filter=True, headers=self.headers)
             # response_text=response.text
             # print('==================')
             # print(response_text)
